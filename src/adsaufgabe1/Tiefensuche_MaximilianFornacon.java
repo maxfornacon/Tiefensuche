@@ -14,16 +14,30 @@ public class Tiefensuche_MaximilianFornacon implements ITiefensuche {
 		istBekannt[u] = true;
 		zeit++;
 		entdeckt[u] = zeit;
-		System.out.println(u + " entdeckt: " + entdeckt[u]);
-		for (int v = 0; v < anzKnoten && graph.anfrageKante(u, v) == true; v++) {
-			if (!istBekannt[v]) {
-				u = vorgaenger[v];
-				expand(graph, v);
+		//System.out.println(u + " entdeckt: " + entdeckt[u]);
+		for (int v = 0; v < anzKnoten; v++) {
+			if (graph.anfrageKante(u, v)) {
+				if (!istBekannt[v]) {
+					vorgaenger[v] = u;
+					expand(graph, v);
+				}	
 			}
+			
 		}
 		zeit++;
 		fertig[u] = zeit;
-		System.out.println(u + " fertig: " + fertig[u]);
+		//System.out.println(u + " fertig: " + fertig[u]);
+	}
+	
+	public static Kantentyp setzeTyp(int quelle, int ziel) {
+		if (entdeckt[quelle] < entdeckt[ziel] && entdeckt[ziel] < fertig[ziel] &&  fertig[ziel] < fertig[quelle]) {
+			return Kantentyp.Baumkante;
+		} else if (entdeckt[ziel] < entdeckt[quelle] && entdeckt[quelle] < fertig[quelle] && fertig[quelle] < fertig[ziel] || (entdeckt[ziel] == entdeckt[quelle] &&  fertig[ziel] == fertig[quelle])){
+			return Kantentyp.Rueckwaertskante;
+		} else if (entdeckt[ziel] < fertig[ziel] && fertig[ziel] < entdeckt[quelle] && entdeckt[quelle] < fertig[quelle]) {
+			return Kantentyp.Querkante;
+		}
+		return null;
 	}
 	
 	@Override
@@ -49,11 +63,12 @@ public class Tiefensuche_MaximilianFornacon implements ITiefensuche {
 			}
 			System.out.println("Knoten " + indexQuelleDerKante + ": ("+ entdeckt[indexQuelleDerKante] + "," + fertig[indexQuelleDerKante] + ")");
 			System.out.println("Knoten " + indexZielDerKante + ": ("+ entdeckt[indexZielDerKante] + "," + fertig[indexZielDerKante] + ")");
-
+			
+			return setzeTyp(indexQuelleDerKante, indexZielDerKante);
 		} else {
 			return Kantentyp.KeineKante;
 		}
-		return null;
+		
 	}
 
 }
